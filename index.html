@@ -1,50 +1,57 @@
 
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>متجر زيت بروكسي الأفغاني الأصلي</title>
-<style>
-  body { font-family: Arial, sans-serif; direction: rtl; text-align: center; }
-  .product { border: 1px solid #ccc; padding: 10px; margin: 10px; display: inline-block; width: 250px; }
-  img { max-width: 100%; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>زيت بروكسي الأفغاني الأصلي</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f7f7f7; }
+        header { background: #006400; color: white; padding: 20px; text-align: center; font-size: 24px; }
+        .product { background: white; padding: 20px; margin: 20px; border-radius: 10px; box-shadow: 0px 0px 5px rgba(0,0,0,0.1); }
+        .product img { max-width: 100%; border-radius: 10px; }
+        .btn-whatsapp { display: inline-block; background: green; color: white; padding: 10px 15px; margin-top: 10px; text-decoration: none; border-radius: 5px; }
+        .posts { margin: 20px; }
+        .post { background: white; padding: 15px; margin-bottom: 15px; border-radius: 10px; box-shadow: 0px 0px 5px rgba(0,0,0,0.1); }
+    </style>
 </head>
 <body>
 
-<h1>متجر زيت بروكسي الأفغاني الأصلي</h1>
+<header>زيت بروكسي الأفغاني الأصلي</header>
+
 <div class="product">
-  <img src="https://via.placeholder.com/250" alt="زيت بروكسي الأفغاني">
-  <h2>زيت بروكسي الأفغاني</h2>
-  <p>السعر: 250 ريال سعودي</p>
-  <a href="https://wa.me/967778378979" target="_blank">اطلب عبر واتساب</a>
+    <img src="https://via.placeholder.com/400x300?text=زيت+بروكسي" alt="المنتج">
+    <h2>زيت بروكسي الأفغاني الأصلي</h2>
+    <p>السعر: 250 ريال سعودي</p>
+    <a class="btn-whatsapp" href="https://wa.me/967778378979" target="_blank">اطلب الآن عبر واتساب</a>
 </div>
 
-<h2>آخر منشورات صفحتنا على فيسبوك</h2>
-<div id="fb-posts">جاري تحميل المنشورات...</div>
+<h2 style="margin:20px;">أحدث المنشورات</h2>
+<div id="posts" class="posts">جاري جلب المنشورات...</div>
 
 <script>
-fetch('/.netlify/functions/fb-feed')
-  .then(res => res.json())
-  .then(data => {
-    let postsHTML = "";
-    if (data.data) {
-      data.data.forEach(post => {
-        postsHTML += `
-          <div style="border:1px solid #ddd; margin:10px; padding:10px;">
-            <p>${post.message || ""}</p>
-            ${post.full_picture ? `<img src="${post.full_picture}" width="300">` : ""}
-            <br>
-            <a href="${post.permalink_url}" target="_blank">عرض المنشور</a>
-          </div>
-        `;
-      });
-    } else {
-      postsHTML = "تعذر تحميل المنشورات.";
+    async function loadPosts() {
+        try {
+            let response = await fetch(`https://graph.facebook.com/v17.0/648535001683849/posts?access_token=EAARzFxHIIKQBPP0HBfsaCQeloqHj0iUGlXorRficD2iLzZAL88Jm1QACoIWSejwh5BSZB0PPkIpqoFS8rXzc926cgr3VEAi14EyUEjW5mgzSHfQxcZAErZCRXb9wp1WbvOD4q8PNKMwhJU3IbVtV4bTaFMUPdstLiDBZCh1S9cDBrdt258rR2qeQc8Jf7SRB11ZBRJJf94PDyuGjS5uHbVUBbKCvdA6sQjtFZCeKPrQNK3wHVW4NW2nPbI9B3EZD&fields=message,created_time,permalink_url`);
+            let data = await response.json();
+            let postsContainer = document.getElementById("posts");
+            postsContainer.innerHTML = "";
+            if(data.data) {
+                data.data.forEach(post => {
+                    let div = document.createElement("div");
+                    div.className = "post";
+                    div.innerHTML = `<p>${post.message || "بدون نص"}</p>
+                                     <a href="${post.permalink_url}" target="_blank">عرض على فيسبوك</a>`;
+                    postsContainer.appendChild(div);
+                });
+            } else {
+                postsContainer.innerHTML = "لا توجد منشورات متاحة.";
+            }
+        } catch (error) {
+            document.getElementById("posts").innerHTML = "حدث خطأ أثناء جلب المنشورات.";
+        }
     }
-    document.getElementById("fb-posts").innerHTML = postsHTML;
-  });
+    loadPosts();
 </script>
 
 </body>
