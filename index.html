@@ -1,88 +1,50 @@
+
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>متجر زيت بروكسي الأفغاني الأصلي</title>
 <style>
-body { font-family: Arial, sans-serif; background: #f7f7f7; margin: 0; padding: 0; }
-header { background: #008b44; color: #fff; text-align: center; padding: 16px; font-size: 24px; }
-.container { max-width: 1000px; margin: 20px auto; padding: 0 12px; }
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px,1fr)); gap: 16px; }
-.card { background: #fff; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.1); overflow: hidden; }
-.card img { width: 100%; height: 180px; object-fit: cover; }
-.pad { padding: 12px; }
-.price { color: #008b44; font-weight: bold; margin: 8px 0; }
-.btn { display: inline-block; background: #25D366; color: #fff; text-decoration: none; padding: 10px 14px; border-radius: 8px; }
-h2.section { margin: 24px 0 12px; }
-.post-card { background: #fff; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); padding: 12px; margin-bottom: 16px; }
-.post-card img { max-width: 100%; border-radius: 8px; margin-top: 8px; }
-.post-date { color: #555; font-size: 13px; margin-bottom: 6px; }
-footer { margin-top: 24px; background: #008b44; color: #fff; text-align: center; padding: 12px; }
+  body { font-family: Arial, sans-serif; direction: rtl; text-align: center; }
+  .product { border: 1px solid #ccc; padding: 10px; margin: 10px; display: inline-block; width: 250px; }
+  img { max-width: 100%; }
 </style>
 </head>
 <body>
 
-<header>🌿 متجر زيت بروكسي الأفغاني الأصلي 🌿</header>
-
-<div class="container">
-
-<h2 class="section">منتجاتنا</h2>
-<div class="grid">
-  <div class="card">
-    <img src="https://via.placeholder.com/600x400.png?text=زيت+بروكسي" alt="زيت بروكسي">
-    <div class="pad">
-      <h3>زيت بروكسي الأفغاني الأصلي</h3>
-      <div class="price">250 ريال سعودي</div>
-      <a class="btn" href="https://wa.me/967778378979" target="_blank">اطلب عبر واتساب</a>
-    </div>
-  </div>
-  <div class="card">
-    <img src="https://via.placeholder.com/600x400.png?text=منتج+تجريبي" alt="منتج آخر">
-    <div class="pad">
-      <h3>منتج تجريبي</h3>
-      <div class="price">150 ريال سعودي</div>
-      <a class="btn" href="https://wa.me/967778378979" target="_blank">اطلب عبر واتساب</a>
-    </div>
-  </div>
+<h1>متجر زيت بروكسي الأفغاني الأصلي</h1>
+<div class="product">
+  <img src="https://via.placeholder.com/250" alt="زيت بروكسي الأفغاني">
+  <h2>زيت بروكسي الأفغاني</h2>
+  <p>السعر: 250 ريال سعودي</p>
+  <a href="https://wa.me/967778378979" target="_blank">اطلب عبر واتساب</a>
 </div>
 
-<h2 class="section">آخر منشوراتنا على فيسبوك</h2>
-<div id="fb-posts">جارِ تحميل المنشورات...</div>
-
-</div>
-<footer>جميع الحقوق محفوظة © 2025</footer>
+<h2>آخر منشورات صفحتنا على فيسبوك</h2>
+<div id="fb-posts">جاري تحميل المنشورات...</div>
 
 <script>
-async function loadFBPosts() {
-  try {
-    const res = await fetch('/.netlify/functions/fb-feed');
-    const data = await res.json();
-    const posts = data && data.data ? data.data : [];
-    const container = document.getElementById('fb-posts');
-    container.innerHTML = '';
-    if (!posts.length) {
-      container.textContent = 'لا توجد منشورات حتى الآن.';
-      return;
+fetch('/.netlify/functions/fb-feed')
+  .then(res => res.json())
+  .then(data => {
+    let postsHTML = "";
+    if (data.data) {
+      data.data.forEach(post => {
+        postsHTML += `
+          <div style="border:1px solid #ddd; margin:10px; padding:10px;">
+            <p>${post.message || ""}</p>
+            ${post.full_picture ? `<img src="${post.full_picture}" width="300">` : ""}
+            <br>
+            <a href="${post.permalink_url}" target="_blank">عرض المنشور</a>
+          </div>
+        `;
+      });
+    } else {
+      postsHTML = "تعذر تحميل المنشورات.";
     }
-    posts.forEach(post => {
-      const div = document.createElement('div');
-      div.className = 'post-card';
-      const date = post.created_time ? new Date(post.created_time).toLocaleString('ar-EG', {dateStyle:'medium', timeStyle:'short'}) : '';
-      const message = post.message ? post.message.replace(/</g,'&lt;').replace(/>/g,'&gt;') : '';
-      const img = post.full_picture ? `<img src="${post.full_picture}" alt="صورة المنشور">` : '';
-      const link = post.permalink_url ? `<div style="margin-top:8px"><a href="${post.permalink_url}" target="_blank">عرض المنشور على فيسبوك</a></div>` : '';
-      div.innerHTML = `<div class="post-date">${date}</div><div>${message}</div>${img}${link}`;
-      container.appendChild(div);
-    });
-  } catch (err) {
-    document.getElementById('fb-posts').textContent = 'تعذر تحميل المنشورات.';
-    console.error(err);
-  }
-}
-
-loadFBPosts();
-setInterval(loadFBPosts, 300000);
+    document.getElementById("fb-posts").innerHTML = postsHTML;
+  });
 </script>
 
 </body>
